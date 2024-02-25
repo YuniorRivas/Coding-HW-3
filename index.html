@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Coding HW 3</title>
+<style>
+    body {
+        font-family: 'Helvetica', sans-serif;
+    }
+    .title {
+        text-align: center;
+        margin: 20px 0;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid grey;
+        text-align: left;
+        padding: 8px;
+    }
+    .positive {
+        color: green;
+    }
+    .negative {
+        color: red;
+    }
+    #chartContainer {
+        width: 100%;
+        height: 700px;
+        display: flex;
+        justify-content: center;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h2 class="title">S&P 500, FEBRUARY 2024</h2>
+
+<div id="dataContainer">
+    <div id="results"></div>
+
+ <div id="chartContainer">
+    <canvas id="snpChart"></canvas>
+</div>
+
+
+
+<script>
+let snp_data = [
+    {"Date":"2/5/24","Close":4942.81},
+    {"Date":"2/6/24","Close":4954.23},
+    {"Date":"2/7/24","Close":4995.06},
+    {"Date":"2/8/24","Close":4997.91},
+    {"Date":"2/9/24","Close":5026.61},
+    {"Date":"2/12/24","Close":5021.84},
+    {"Date":"2/13/24","Close":4953.17},
+    {"Date":"2/14/24","Close":5000.62},
+    {"Date":"2/15/24","Close":5029.73},
+    {"Date":"2/16/24","Close":5005.57}
+];
+
+const resultsContainer = document.getElementById('results');
+let table = document.createElement('table');
+table.innerHTML = `<tr>
+    <th>Date</th>
+    <th>Close</th>
+    <th>Change</th>
+</tr>`;
+resultsContainer.appendChild(table);
+
+snp_data.forEach((item, index) => {
+    let change = index === 0 ? 'N/A' : item.Close - snp_data[index - 1].Close;
+    let row = table.insertRow();
+    let cell1 = row.insertCell(0);
+    let cell2 = row.insertCell(1);
+    let cell3 = row.insertCell(2);
+    cell1.innerHTML = item.Date;
+    cell2.innerHTML = item.Close.toFixed(2);
+    if (change !== 'N/A') {
+        cell3.innerHTML = `${change > 0 ? `<span class="positive">&#x25B2; ${change.toFixed(2)}</span>` : `<span class="negative">&#x25BC; ${change.toFixed(2)}</span>`}`;
+    } else {
+        cell3.innerHTML = change;
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('snpChart').getContext('2d');
+
+    let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(0, 128, 0, 1)'); 
+    gradient.addColorStop(1, 'rgba(0, 128, 0, 0.05)');
+
+    const dates = snp_data.map(item => item.Date);
+    const closePrices = snp_data.map(item => item.Close);
+
+    const snpChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'S&P 500 Close Prices',
+                data: closePrices,
+                borderColor: 'rgba(0, 128, 0, 1)',
+                borderWidth: 2,
+                fill: true,
+                backgroundColor: gradient,
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 4900
+                }
+            }
+        }
+    });
+});
+
+</script>
+
+</body>
+</html>
